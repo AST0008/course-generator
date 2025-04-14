@@ -3,7 +3,8 @@ import { Lexend } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
-
+import { Providers } from "@/components/Providers";
+import { ThemeProvider } from "@/components/theme-provider";
 const lexend = Lexend({
   subsets: ["latin"],
 });
@@ -20,16 +21,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={cn(
-          lexend.className,
-          "min-h-screen bg-background text-foreground"
-        )}
-      >
-        
-        <Navbar />
-        {children}
-    
+      <body>
+      <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+        <Providers>
+          
+          {children}</Providers>
+          </ThemeProvider>
       </body>
     </html>
   );

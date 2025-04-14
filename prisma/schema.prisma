@@ -14,17 +14,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  email     String?    @unique
-  emailVerified  DateTime?  
-  image     String? 
-  credits   Int?      @default(10)
+  id            String    @id @default(cuid())
+  name          String
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  credits       Int?      @default(10)
 
-
-    accounts      Account[]
-  sessions      Session[]
-
+  accounts Account[]
+  sessions Session[]
 }
 
 model Account {
@@ -40,14 +38,58 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
- 
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id    String @id @default(cuid())
+  name  String
+  image String
+  units Unit[]
+}
+
+model Unit {
+  id      String    @id @default(cuid())
+  coursId String
+  name    String
+  course  Course    @relation(fields: [coursId], references: [id])
+  Chapter Chapter[]
+
+  @@index([coursId], name: "courseId")
+}
+
+model Chapter {
+  id     String @id @default(cuid())
+  unitId String
+
+  name               String
+  youtubeSearchQuery String
+  videoId            String?
+  summary            String?    @db.VarChar(3000)
+  unit               Unit       @relation(fields: [unitId], references: [id])
+  questions          Question[]
+
+  @@index([unitId], name: "unitID")
+}
+
+model Question {
+  id        String @id @default(cuid())
+  chapterId String
+  question  String @db.VarChar(3000)
+  answer    String @db.VarChar(3000)
+  options   String @db.VarChar(3000)
+
+  chapter Chapter @relation(fields: [chapterId], references: [id])
+
+  @@index([chapterId, question], name: "chapter_question_index")
 }

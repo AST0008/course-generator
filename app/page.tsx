@@ -1,27 +1,14 @@
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+import { getAuthSession } from "@/lib/auth";
 import Image from "next/image";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getAuthSession();
   return (
-    <div className="relative h-screen">
-      <div className="absolute top-0 w-full h-full custom-shape-divider-bottom-1742189063">
-        <svg
-          data-name="Layer 1"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
-            className="shape-fill"
-          ></path>
-        </svg>
-      </div>
-
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Button size="lg">Welcome to Coursely</Button>
-      </div>
-    </div>
+    <>
+      <Navbar session={session} />
+      <div className="relative h-screen">Welcome to Coursely</div>
+    </>
   );
 }
-
