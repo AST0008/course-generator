@@ -1,4 +1,6 @@
+import { prisma } from "@/lib/db";
 import { strict_output } from "@/lib/gpt";
+import { getUnsplashImage } from "@/lib/unsplash";
 import { createCourseSchema } from "@/validators/course";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
@@ -32,8 +34,49 @@ export async function POST(request: Request) {
       }
     );
 
-    console.log("Output units", output_units);
-    return NextResponse.json(output_units);
+    const imageSearchItem = await strict_output(
+      "You are an AI capable of finding the most relevant image for a course",
+      `Please provide a good image search term for a course about ${title}. This search term will be fed into unsplash API, so make sure its a good search term that will return a good result.`,
+      {
+        image_search_term: "a good search term for the course",
+      }
+    );
+
+    const course_image = await getUnsplashImage(
+      imageSearchItem.image_search_term
+    );
+    const course = await prisma.course.create({
+      data: {
+        name: title,
+        image: course_image,
+      },
+    });
+
+    for (const unit of output_units) {
+      const title = unit.title;
+      const prismaUnit = await prisma.unit.create({
+        data: {
+          name: title,
+          course: {
+            connect: {
+              id: course.id
+            }
+          }
+        },
+      });
+
+      await prisma.chapter.createMany({
+        data: unit.chapters.map((chapter) => {
+          return {
+            name: chapter.chapter_title,
+            unitId: prismaUnit.id,
+            youtubeSearchQuery: chapter.youtube_search_query,
+          };
+        }),
+      });
+    }
+    
+    return NextResponse.json({ course_id: course.id });
   } catch (error) {
     if (error instanceof ZodError) {
       return new NextResponse("Invalid body", { status: 400 });
