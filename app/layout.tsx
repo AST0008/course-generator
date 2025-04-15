@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-import Navbar from "@/components/Navbar";
 import { Providers } from "@/components/Providers";
 import { ThemeProvider } from "@/components/theme-provider";
-const lexend = Lexend({
-  subsets: ["latin"],
-});
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Coursely",
@@ -22,16 +18,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-      <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-        <Providers>
-          
-          {children}</Providers>
-          </ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>{children}</Providers>
+        </ThemeProvider>
+          <Toaster />
       </body>
     </html>
   );
