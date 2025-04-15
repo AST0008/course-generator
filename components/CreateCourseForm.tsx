@@ -18,10 +18,26 @@ import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Plus, Trash } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { notify } from "./ui/sonner";
 
 type FormInput = z.infer<typeof createCourseSchema>;
 
 const CreateCourseForm = () => {
+  const router = useRouter();
+  const { mutate: createChapters, isLoading } = useMutation({
+    mutationFn: async ({ title, units }: FormInput) => {
+      const response = await axios.post("/api/course/createChapters", {
+        title,
+        units,
+      });
+      return response.data;
+    },
+  });
+
   const form = useForm<FormInput>({
     resolver: zodResolver(createCourseSchema),
     defaultValues: {
@@ -32,6 +48,35 @@ const CreateCourseForm = () => {
 
   function onSubmit(values: z.infer<typeof createCourseSchema>) {
     console.log(values);
+
+    const hasEmptyUnit = values.units.some((unit) => unit === "");
+    if (hasEmptyUnit) {
+      notify({
+        title: "Error",
+        description: "Please fill in all the units",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createChapters(values, {
+      onSuccess: ({ course_id }) => {
+        console.log(course_id);
+        notify({
+          title: "Success",
+          description: "Course created successfully",
+        });
+        router.push(`/create/${course_id}`);
+      },
+      onError: (error) => {
+        console.log(error);
+        notify({
+          title: "Error",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      },
+    });
   }
 
   form.watch();
@@ -151,7 +196,11 @@ const CreateCourseForm = () => {
         {/* Add dynamic inputs for Units later if needed */}
 
         <div className="flex justify-end">
-          <Button type="submit" className="px-6 py-2 text-md">
+          <Button
+            disabled={isLoading}
+            type="submit"
+            className="px-6 py-2 text-md"
+          >
             Let's Go
           </Button>
         </div>
