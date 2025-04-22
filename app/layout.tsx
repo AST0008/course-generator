@@ -4,6 +4,9 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/Navbar";
+import { getServerSession } from "next-auth";
+import { authoptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Coursely",
@@ -26,7 +29,7 @@ export default function RootLayout({
         >
           <Providers>{children}</Providers>
         </ThemeProvider>
-          <Toaster />
+        <Toaster />
       </body>
     </html>
   );

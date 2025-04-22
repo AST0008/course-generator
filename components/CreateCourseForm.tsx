@@ -22,6 +22,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { notify } from "./ui/sonner";
+import SubscriptionAction from "./SubscriptionAction";
 
 type FormInput = z.infer<typeof createCourseSchema>;
 
@@ -81,6 +82,7 @@ const CreateCourseForm = () => {
   form.watch();
   console.log(form.watch("units"));
   return (
+    <>
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -194,17 +196,19 @@ const CreateCourseForm = () => {
 
         {/* Add dynamic inputs for Units later if needed */}
 
-        <div className="flex justify-end">
+        <div className="flex cursor-pointer justify-end">
           <Button
             disabled={isLoading}
             type="submit"
-            className="px-6 py-2 text-md"
+            className="px-6 py-2 cursor-pointer text-md"
           >
             Let's Go
           </Button>
         </div>
       </form>
     </Form>
+    <SubscriptionAction/>
+    </>
   );
 };
 
