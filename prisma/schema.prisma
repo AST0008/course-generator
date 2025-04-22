@@ -82,12 +82,13 @@ model Chapter {
   @@index([unitId], name: "unitID")
 }
 
-model Question {
+model Question {  
   id        String @id @default(cuid())
   chapterId String
   question  String @db.VarChar(3000)
   answer    String @db.VarChar(3000)
   options   String @db.VarChar(3000)
+  videoId   String?
 
   chapter Chapter @relation(fields: [chapterId], references: [id])
 

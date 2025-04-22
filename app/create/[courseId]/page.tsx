@@ -11,10 +11,15 @@ type Props = {
   };
 };
 
-const CreateChapter = async ({ params: { courseId } }: Props) => {
+const CreateChapter = async ({ params }: Props) => {
   const session = await getAuthSession();
   if (!session?.user) {
     return redirect("/gallery");
+  }
+
+  const courseId = await params.courseId;
+  if (!courseId) {
+    return redirect("/create");
   }
 
   const course = await prisma.course.findUnique({
@@ -30,18 +35,18 @@ const CreateChapter = async ({ params: { courseId } }: Props) => {
     },
   });
 
-  // Transform "Chapter" to "chapters"
-  const transformedCourse = {
-    ...course,
-    units: course?.units.map((unit) => ({
-      ...unit,
-      chapters: unit.Chapter,
-    })),
-  };
-
   if (!course) {
     return redirect("/create");
   }
+
+  // Transform the course data to match the expected type
+  const transformedCourse = {
+    ...course,
+    units: course.units.map(unit => ({
+      ...unit,
+      Chapter: unit.Chapter || []
+    }))
+  };
 
   //   return <pre>{JSON.stringify(course, null, 2)}</pre>;
   return (
@@ -58,7 +63,7 @@ const CreateChapter = async ({ params: { courseId } }: Props) => {
           the Button to confirm and continue.
         </div>
       </div>
-        <ConfirmChapters course={course} />
+      <ConfirmChapters course={transformedCourse} />
     </div>
   );
 };

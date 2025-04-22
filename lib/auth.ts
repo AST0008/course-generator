@@ -20,7 +20,11 @@ declare module "next-auth/jwt" {
   }
 }
 
+
+
+
 export const authoptions: NextAuthOptions = {
+  
   session: {
     strategy: "jwt",
   },
@@ -30,6 +34,7 @@ export const authoptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      
     }),
   ],
   callbacks: {

@@ -20,7 +20,6 @@ import { Plus, Trash } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { notify } from "./ui/sonner";
 
