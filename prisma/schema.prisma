@@ -82,15 +82,25 @@ model Chapter {
   @@index([unitId], name: "unitID")
 }
 
-model Question {  
-  id        String @id @default(cuid())
+model Question {
+  id        String  @id @default(cuid())
   chapterId String
-  question  String @db.VarChar(3000)
-  answer    String @db.VarChar(3000)
-  options   String @db.VarChar(3000)
+  question  String  @db.VarChar(3000)
+  answer    String  @db.VarChar(3000)
+  options   String  @db.VarChar(3000)
   videoId   String?
 
   chapter Chapter @relation(fields: [chapterId], references: [id])
 
   @@index([chapterId, question], name: "chapter_question_index")
+}
+
+model UserSubscription {
+  id                       String    @id @default(cuid())
+  userId                   String    @unique
+  razorpayCustomerId       String    @unique @map("razorpay_customer_id")
+  razorpaySubscriptionId   String?   @unique @map("razorpay_subscription_id")
+  razorpayPriceId          String?   @map("razorpay_price_id")
+  razorpayCurrentPeriodEnd DateTime? @map("razorpay_current_period_end")
+  isPro                    Boolean   @default(false)
 }
