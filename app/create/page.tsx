@@ -1,6 +1,7 @@
 import CreateCourseForm from "@/components/CreateCourseForm";
 import Navbar from "@/components/Navbar";
 import { getAuthSession } from "@/lib/auth";
+import { checkSubscription } from "@/lib/subscription";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -12,6 +13,8 @@ const page = async (props: Props) => {
   if (!session) {
     return redirect("/gallery");
   }
+  const isPro = await checkSubscription();
+
   return (
     <>
       <Navbar session={session} />
@@ -26,7 +29,7 @@ const page = async (props: Props) => {
           </div>
         </div>
 
-        <CreateCourseForm />
+        <CreateCourseForm isPro={isPro} />
       </div>
     </>
   );
