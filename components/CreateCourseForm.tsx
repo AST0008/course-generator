@@ -26,7 +26,7 @@ import SubscriptionAction from "./SubscriptionAction";
 
 type FormInput = z.infer<typeof createCourseSchema>;
 
-const CreateCourseForm = () => {
+const CreateCourseForm = ({ isPro }: { isPro: boolean }) => {
   const router = useRouter();
   const { mutate: createChapters, isLoading } = useMutation({
     mutationFn: async ({ title, units }: FormInput) => {
@@ -207,7 +207,7 @@ const CreateCourseForm = () => {
         </div>
       </form>
     </Form>
-    <SubscriptionAction/>
+    {!isPro && <SubscriptionAction/>}
     </>
   );
 };

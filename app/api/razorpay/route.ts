@@ -107,9 +107,8 @@ export async function GET() {
       console.log("[RAZORPAY DEBUG] Creating subscription with customer:", customerId);
       const subscription = await razorpay.subscriptions.create({
         plan_id: process.env.RAZORPAY_PLAN_ID,
-        customer_id: customerId,
-        total_count: 12, // 12 months subscription
         customer_notify: 1,
+        total_count: 12, // 12 months subscription
         notes: { 
           userId: session.user.id 
         },
@@ -117,23 +116,45 @@ export async function GET() {
       
       console.log("[RAZORPAY DEBUG] Subscription created:", subscription.id);
 
+      // Calculate subscription end date (12 months from now)
+      const currentDate = new Date();
+      const subscriptionEndDate = new Date(currentDate);
+      subscriptionEndDate.setMonth(currentDate.getMonth() + 12);
+
       // Store customer ID in database if not already there
       if (!userSubscription?.razorpayCustomerId) {
         // Check if user subscription exists
         if (userSubscription) {
           await prisma.userSubscription.update({
             where: { userId: session.user.id },
-            data: { razorpayCustomerId: customerId }
+            data: { 
+              razorpayCustomerId: customerId,
+              razorpaySubscriptionId: subscription.id,
+              razorpayCurrentPeriodEnd: subscriptionEndDate,
+              isPro: true,
+            }
           });
         } else {
           await prisma.userSubscription.create({
             data: {
               userId: session.user.id,
               razorpayCustomerId: customerId,
-              // Don't set subscription ID yet, will be updated by webhook
+              razorpaySubscriptionId: subscription.id,
+              razorpayCurrentPeriodEnd: subscriptionEndDate,
+              isPro: true,
             }
           });
         }
+      } else {
+        // Update existing subscription
+        await prisma.userSubscription.update({
+          where: { userId: session.user.id },
+          data: {
+            razorpaySubscriptionId: subscription.id,
+            razorpayCurrentPeriodEnd: subscriptionEndDate,
+            isPro: true,
+          }
+        });
       }
 
       // Return checkout data for frontend

@@ -28,6 +28,7 @@
     "dotenv": "^16.5.0",
     "framer-motion": "^12.6.3",
     "gemini-client": "^1.0.1",
+    "gocardless-nodejs": "^4.5.0",
     "lucide-react": "^0.482.0",
     "next": "15.2.2",
     "next-auth": "^4.24.11",

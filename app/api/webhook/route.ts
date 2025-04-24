@@ -6,14 +6,14 @@ export async function POST(req: Request) {
   try {
     const body = await req.text();
     const signature = req.headers.get("x-razorpay-signature");
-    
+
     if (!signature) {
       console.error("[RAZORPAY WEBHOOK] Missing signature");
       return new NextResponse("Missing signature", { status: 400 });
     }
-    
+
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-    
+
     if (!secret) {
       console.error("[RAZORPAY WEBHOOK] Missing webhook secret");
       return new NextResponse("Server configuration error", { status: 500 });
@@ -32,12 +32,17 @@ export async function POST(req: Request) {
     const event = JSON.parse(body);
     console.log("[RAZORPAY WEBHOOK] Event received:", event.event);
 
-    if (event.event === "subscription.activated" || event.event === "subscription.created") {
+    if (
+      event.event === "subscription.activated" ||
+      event.event === "subscription.created"
+    ) {
       const subscription = event.payload.subscription.entity;
       const userId = subscription.notes?.userId;
 
       if (!userId) {
-        console.error("[RAZORPAY WEBHOOK] Missing userId in subscription notes");
+        console.error(
+          "[RAZORPAY WEBHOOK] Missing userId in subscription notes"
+        );
         return new NextResponse("Missing userId", { status: 400 });
       }
 
@@ -72,8 +77,11 @@ export async function POST(req: Request) {
           },
         });
       }
-      
-      console.log("[RAZORPAY WEBHOOK] Subscription record created/updated for user:", userId);
+
+      console.log(
+        "[RAZORPAY WEBHOOK] Subscription record created/updated for user:",
+        userId
+      );
     }
 
     if (event.event === "subscription.charged") {
@@ -88,11 +96,14 @@ export async function POST(req: Request) {
           isPro: true,
         },
       });
-      
+
       console.log("[RAZORPAY WEBHOOK] Subscription renewed:", subscription.id);
     }
 
-    if (event.event === "subscription.cancelled" || event.event === "subscription.expired") {
+    if (
+      event.event === "subscription.cancelled" ||
+      event.event === "subscription.expired"
+    ) {
       const subscription = event.payload.subscription.entity;
 
       await prisma.userSubscription.updateMany({
@@ -103,8 +114,11 @@ export async function POST(req: Request) {
           isPro: false,
         },
       });
-      
-      console.log("[RAZORPAY WEBHOOK] Subscription cancelled/expired:", subscription.id);
+
+      console.log(
+        "[RAZORPAY WEBHOOK] Subscription cancelled/expired:",
+        subscription.id
+      );
     }
 
     return new NextResponse(null, { status: 200 });
